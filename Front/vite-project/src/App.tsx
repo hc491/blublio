@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [libelle, setLibelle] = useState(""); //titre du film saisi par utilisateur
+  const [result, setResult] = useState(""); //résultat de la recherche(film trouvé ou message erreur)
+
+  //fonction pour effectuer la recherche
+  const searchFilm = async () => {
+    try {
+      const response = await fetch(`http://localhost:4242/titres/${libelle}`);
+      const data = await response.json();
+
+      //vérifie si film trouvé
+      if (data.length > 0) {
+        setResult(data[0].libelle);
+      } else {
+        setResult("Pas dans la bibliothèque");
+      }
+    } catch (error) {
+      console.error(error);
+      setResult("Erreur dans la recherche");
+    }
+    setLibelle("");
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <header>
+        <h1>BLUTHEQUE</h1>
+        <div className="search-bar">
+        <input
+          type="text"
+          value={libelle}
+          onChange={(e) => setLibelle(e.target.value)}
+          placeholder="Entrez un titre de film..."
+        />
+
+        <button onClick={searchFilm}>Rechercher</button>
+        </div>
+      </header>
+
+      <main>
+        <section>
+        <p>{result}</p>
+      </section>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;

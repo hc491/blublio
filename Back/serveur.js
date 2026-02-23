@@ -20,14 +20,14 @@ app.get("/themes", async (req, res) => {
   }
 });
 
-app.get("/themes/titres/:themeId", async (req, res) => {
+app.get("/titres/:libelle", async (req, res) => {
   try {
-    const {themeId} = req.params;
+    const {libelle} = req.params;
     const sql = neon(`${process.env.DATABASE_URL}`);
     const response = await sql`
     SELECT id,libelle
     FROM titres
-    WHERE themes_id = ${themeId}`;
+    WHERE libelle ILIKE ${'%'+libelle+'%'}`;//insensible à la casse
     console.log(response);
     res.json(response);
   } catch (error) {
