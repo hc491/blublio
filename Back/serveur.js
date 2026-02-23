@@ -20,6 +20,23 @@ app.get("/themes", async (req, res) => {
   }
 });
 
+app.get("/themes/titres/:themeId", async (req, res) => {
+  try {
+    const {themeId} = req.params;
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const response = await sql`
+    SELECT id,libelle
+    FROM titres
+    WHERE themes_id = ${themeId}`;
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "erreur du serveur" });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Listening to http://localhost:${PORT}`);
 });
