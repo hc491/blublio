@@ -5,5 +5,9 @@ Créer son lien avec Github
 Faire sa base de données
 GET dans serveur.js: vérifier avec thunderclient
 Créer un input: useState
+Créer bouton "rechercher"
+styliser input+"rechercher"
+Créer en front catégories: disney et science-fiction
+
 
 
