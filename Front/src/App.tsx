@@ -1,23 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [libelle, setLibelle] = useState(""); //titre du film saisi par utilisateur
   const [result, setResult] = useState(""); //résultat de la recherche(film trouvé ou message erreur)
   const [films, setFilms] = useState([]);
+  const [themes, setThemes] = useState([]);
+
+  //récupère thèmes au chargement de la page
+  useEffect(() => {
+    const fetchThemes = async () => {
+      try {
+        const response = await fetch("http://localhost:4242/themes");
+        const data = await response.json();
+        setThemes(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchThemes();
+  }, []);
 
   //fonction pour effectuer la recherche
   const searchFilm = async () => {
     setFilms([]);
     try {
-      const response = await fetch(`http://localhost:4242/titres/${libelle}`);
+      const response = await fetch(`http://localhost:4242/items/${libelle}`);
       const data = await response.json();
 
       //vérifie si film trouvé
       if (data.length > 0) {
-        setResult(data[0].libelle);
+        setFilms(data);
+        setResult("");
       } else {
-        setResult("Pas dans la bibliothèque");
+        setResult("Pas dans la bibliothèque")
+        setFilms([]);
       }
     } catch (error) {
       console.error(error);
@@ -30,14 +47,15 @@ function App() {
   const searchByTheme = async (themeId) => {
     setResult("");
     try {
-      const response = await fetch(`http://localhost:4242/themes/${themeId}/titres`);
-      const data = await response.json()
+      const response = await fetch(
+        `http://localhost:4242/themes/${themeId}/items`,
+      );
+      const data = await response.json();
       setFilms(data);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
-
+  };
 
   return (
     <div>
@@ -48,15 +66,20 @@ function App() {
             type="text"
             value={libelle}
             onChange={(e) => setLibelle(e.target.value)}
-            placeholder="Entrez un titre de film..."
+            placeholder="🔍 Entrez un titre de film..."
           />
 
           <button onClick={searchFilm}>Rechercher</button>
         </div>
 
         <div className="theme-buttons">
-          <button onClick={() => searchByTheme(1)}>Disney</button>
-          <button onClick={()=> searchByTheme(2)}>Science-Fiction</button>
+          {themes.map((theme) => {
+            return (
+              <button key={theme.id} onClick={() => searchByTheme(theme.id)}>
+                {theme.name}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -64,13 +87,16 @@ function App() {
         <section>
           <p>{result}</p>
           {films.length > 0 && (
-            <ul>
-              {films.map((film)=> {
-                return <li key={film.id}>{film.libelle}</li>
+            <ul className="films-grid">
+              {films.map((film) => {
+                return (
+                <li key={film.id} className="films-card">
+                  {film.libelle}
+                  </li>
+                );
               })}
             </ul>
           )}
-
         </section>
       </main>
     </div>

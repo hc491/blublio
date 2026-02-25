@@ -8,14 +8,29 @@ app.use(express.json());
 app.use(cors());
 const PORT = process.env.PORT || 4242;
 
+app.get("/themes", async (req, res) => {
+  try {
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const response = await sql`
+    SELECT *
+    FROM themes
+    `;
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "erreur du serveur" });
+  }
+});
 
-app.get("/titres/:libelle", async (req, res) => {
+
+app.get("/items/:libelle", async (req, res) => {
   try {
     const {libelle} = req.params;
     const sql = neon(`${process.env.DATABASE_URL}`);
     const response = await sql`
     SELECT *
-    FROM titres
+    FROM items
     WHERE libelle ILIKE ${'%'+libelle+'%'}`;//insensible à la casse
     console.log(response);
     res.json(response);
@@ -25,13 +40,13 @@ app.get("/titres/:libelle", async (req, res) => {
   }
 });
 
-app.get("/themes/:id/titres", async (req, res) => {
+app.get("/themes/:id/items", async (req, res) => {
   try {
     const {id} = req.params;
     const sql = neon(`${process.env.DATABASE_URL}`);
     const response = await sql`
     SELECT *
-    FROM titres
+    FROM items
     WHERE themes_id = ${id}
     `;
     console.log(response);
