@@ -1,18 +1,29 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+interface Theme {
+  id: number;
+  name: string;
+}
+
+interface Movie {
+  id: number;
+  libelle: string;
+  themes_id: number;
+}
+
 function App() {
-  const [libelle, setLibelle] = useState(""); //titre du film saisi par utilisateur
-  const [result, setResult] = useState(""); //résultat de la recherche(film trouvé ou message erreur)
-  const [films, setFilms] = useState([]);
-  const [themes, setThemes] = useState([]);
+  const [libelle, setLibelle] = useState<string>(""); //titre du film saisi par utilisateur
+  const [result, setResult] = useState<string>(""); //résultat de la recherche(film trouvé ou message erreur)
+  const [films, setFilms] = useState<Movie[]>([]);
+  const [themes, setThemes] = useState<Theme[]>([]);
 
   //récupère thèmes au chargement de la page
   useEffect(() => {
     const fetchThemes = async () => {
       try {
         const response = await fetch("http://localhost:4242/themes");
-        const data = await response.json();
+        const data: Theme[] = await response.json();
         setThemes(data);
       } catch (error) {
         console.error(error);
@@ -26,14 +37,14 @@ function App() {
     setFilms([]);
     try {
       const response = await fetch(`http://localhost:4242/items/${libelle}`);
-      const data = await response.json();
+      const data: Movie[] = await response.json();
 
       //vérifie si film trouvé
       if (data.length > 0) {
         setFilms(data);
         setResult("");
       } else {
-        setResult("Pas dans la bibliothèque")
+        setResult("Pas dans la bibliothèque");
         setFilms([]);
       }
     } catch (error) {
@@ -44,13 +55,13 @@ function App() {
   };
 
   //Récupère films d'un thème selon son id
-  const searchByTheme = async (themeId) => {
+  const searchByTheme = async (themeId: number) => {
     setResult("");
     try {
       const response = await fetch(
         `http://localhost:4242/themes/${themeId}/items`,
       );
-      const data = await response.json();
+      const data: Movie[] = await response.json();
       setFilms(data);
     } catch (error) {
       console.error(error);
@@ -90,8 +101,8 @@ function App() {
             <ul className="films-grid">
               {films.map((film) => {
                 return (
-                <li key={film.id} className="films-card">
-                  {film.libelle}
+                  <li key={film.id} className="films-card">
+                    {film.libelle}
                   </li>
                 );
               })}
