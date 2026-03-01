@@ -68,6 +68,23 @@ function App() {
     }
   };
 
+  //Supprime un thème et ses films associés
+  const deleteTheme = async (id: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:4242/themes/${id}`, {method: "DELETE"}
+      );
+      const data: Theme = await response.json();
+      console.log("Thème supprimé : ", data);
+      
+      setThemes(themes.filter((theme)=>theme.id !==id));
+      setFilms([]);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <div>
       <header>
@@ -86,9 +103,14 @@ function App() {
         <div className="theme-buttons">
           {themes.map((theme) => {
             return (
-              <button key={theme.id} onClick={() => searchByTheme(theme.id)}>
+              <div key={theme.id} className="theme-item">
+              <button onClick={() => searchByTheme(theme.id)}>
                 {theme.name}
               </button>
+              <button className="delete-btn" onClick={()=> deleteTheme(theme.id)}>
+                🗑️ Supprimer
+              </button>
+              </div>
             );
           })}
         </div>

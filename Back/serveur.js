@@ -75,6 +75,42 @@ app.post("/themes", async (req, res) => {
   }
 });
 
+app.delete("/themes/:id", async (req, res) => {
+  try {
+    const {id} = req.params;
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const response = await sql`
+    DELETE FROM themes
+    WHERE id =${id}
+    `;
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "erreur du serveur" });
+  }
+});
+
+app.put("/themes/:id", async (req, res) => {
+  try {
+    const {id} = req.params;
+    const {name} = req.body;
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const response = await sql`
+    UPDATE themes
+    SET name = ${name}
+    WHERE id= ${id}
+    `;
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "erreur du serveur" });
+  }
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`Listening to http://localhost:${PORT}`);
 });
